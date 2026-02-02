@@ -1,0 +1,2012 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LUMU AI | Интеллектуальный ассистент</title>
+    <style>
+        :root {
+            /* Современная цветовая палитра */
+            --bg-dark: #121212;
+            --bg-darker: #000000;
+            --bg-gray: #1E1E1E;
+            --bg-light-gray: #2D2D2D;
+            --border-gray: #333333;
+            --border-light: #404040;
+            --text-white: #FFFFFF;
+            --text-gray: #B0B0B0;
+            --text-light: #888888;
+            --accent: #FFFFFF;
+            --accent-hover: #F5F5F5;
+            --hover: #252525;
+            --card-bg: rgba(30, 30, 30, 0.8);
+            --pearl-bg: #F8F8F8;
+            --pearl-text: #000000;
+            --radius-sm: 6px;
+            --radius: 12px;
+            --radius-lg: 20px;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.4);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --glass: rgba(30, 30, 30, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-darker);
+            color: var(--text-white);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Стилизация скроллбара */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-darker);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-gray);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border-light);
+        }
+
+        button, .auth-tab, .auth-button, .modal-btn, .game-button, .input-btn, .menu-item {
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        /* Sidebar Menu - современный дизайн */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -320px;
+            width: 300px;
+            height: 100vh;
+            background: var(--bg-dark);
+            border-right: 1px solid var(--border-gray);
+            z-index: 1000;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 999;
+            display: none;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        .menu-header {
+            padding: 0 24px 20px;
+            border-bottom: 1px solid var(--border-gray);
+            margin-bottom: 20px;
+        }
+
+        .menu-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-white);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-title .ai-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--pearl-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 20px;
+            color: var(--pearl-text);
+            box-shadow: var(--shadow-sm);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-section {
+            padding: 0 24px;
+            margin-bottom: 28px;
+        }
+
+        .menu-section-title {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .menu-items {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .menu-item {
+            padding: 16px;
+            background: var(--bg-gray);
+            border: 1px solid var(--border-gray);
+            border-radius: var(--radius);
+            color: var(--text-white);
+            font-size: 15px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .menu-item:hover {
+            background: var(--hover);
+            border-color: var(--border-light);
+            transform: translateX(4px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .menu-item .icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+            opacity: 0.8;
+        }
+
+        .menu-footer {
+            margin-top: auto;
+            padding: 20px 24px;
+            border-top: 1px solid var(--border-gray);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: var(--bg-gray);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-gray);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--pearl-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--pearl-text);
+            box-shadow: var(--shadow-sm);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-white);
+            margin-bottom: 6px;
+        }
+
+        .user-status {
+            font-size: 13px;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10B981;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+        }
+
+        .menu-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--bg-gray);
+            border: 1px solid var(--border-gray);
+            border-radius: var(--radius);
+            color: var(--text-white);
+            font-size: 15px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-weight: 500;
+        }
+
+        .logout-btn:hover {
+            background: var(--hover);
+            border-color: var(--border-light);
+        }
+
+        .new-chat-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--pearl-bg);
+            border: none;
+            border-radius: var(--radius);
+            color: var(--pearl-text);
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .new-chat-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            background: var(--text-white);
+        }
+
+        /* Auth Modal */
+        .auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-darker);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .auth-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 480px;
+            background: var(--glass);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-gray);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .auth-header {
+            padding: 48px 40px 24px;
+            text-align: center;
+            background: transparent;
+        }
+
+        .auth-logo {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 16px;
+            color: var(--text-white);
+            letter-spacing: -0.5px;
+        }
+
+        .auth-tagline {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--text-gray);
+            margin-bottom: 12px;
+        }
+
+        .auth-description {
+            font-size: 14px;
+            color: var(--text-light);
+            line-height: 1.5;
+            max-width: 320px;
+            margin: 0 auto;
+        }
+
+        .auth-content {
+            padding: 32px 40px 48px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 2px;
+            background: var(--bg-gray);
+            padding: 4px;
+            border-radius: var(--radius);
+            margin-bottom: 32px;
+            border: 1px solid var(--border-gray);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 16px;
+            background: transparent;
+            border: none;
+            color: var(--text-gray);
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+        }
+
+        .auth-tab.active {
+            background: var(--bg-light-gray);
+            color: var(--text-white);
+        }
+
+        .auth-form {
+            display: none;
+            width: 100%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 28px;
+            width: 100%;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-gray);
+            margin-bottom: 10px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 18px;
+            background: var(--bg-darker);
+            border: 2px solid var(--border-gray);
+            border-radius: var(--radius);
+            color: var(--text-white);
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        .auth-button {
+            width: 100%;
+            padding: 20px;
+            background: var(--pearl-bg);
+            border: none;
+            border-radius: var(--radius);
+            color: var(--pearl-text);
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .auth-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            background: var(--text-white);
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 32px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .auth-footer a {
+            color: var(--text-white);
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .auth-footer a:hover {
+            opacity: 0.8;
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+            background: var(--bg-darker);
+        }
+
+        .chat-header {
+            padding: 16px 32px;
+            border-bottom: 1px solid var(--border-gray);
+            background: var(--bg-dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 72px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .menu-btn {
+            background: var(--bg-gray);
+            border: 1px solid var(--border-gray);
+            color: var(--text-white);
+            padding: 12px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 400;
+            min-width: 48px;
+            min-height: 48px;
+            transition: var(--transition);
+        }
+
+        .menu-btn:hover {
+            background: var(--hover);
+            border-color: var(--border-light);
+            transform: rotate(90deg);
+        }
+
+        .chat-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-white);
+            letter-spacing: -0.5px;
+        }
+
+        /* Messages */
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px;
+            background: var(--bg-darker);
+        }
+
+        .welcome-container {
+            max-width: 768px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .welcome-title {
+            font-size: 64px;
+            font-weight: 900;
+            margin-bottom: 24px;
+            color: var(--text-white);
+            letter-spacing: -1.5px;
+            background: linear-gradient(135deg, var(--text-white), var(--text-gray));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .welcome-subtitle {
+            font-size: 20px;
+            color: var(--text-gray);
+            margin-bottom: 48px;
+            line-height: 1.7;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .message {
+            max-width: 768px;
+            margin: 0 auto 28px;
+            animation: fadeIn 0.3s ease;
+            display: flex;
+            gap: 20px;
+        }
+
+        .message-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 4px;
+            font-weight: 800;
+            font-size: 18px;
+            color: var(--pearl-text);
+            background: var(--pearl-bg);
+            box-shadow: var(--shadow-sm);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .message.user .message-avatar {
+            background: var(--pearl-bg);
+        }
+
+        .message.ai .message-avatar {
+            background: var(--pearl-bg);
+            font-weight: 900;
+            font-size: 20px;
+        }
+
+        .message-content {
+            padding: 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-gray);
+            border-radius: var(--radius);
+            font-size: 16px;
+            line-height: 1.7;
+            color: var(--text-white);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .message.user .message-content {
+            background: var(--bg-gray);
+            border-color: var(--border-light);
+        }
+
+        .message-time {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-top: 12px;
+            text-align: right;
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            max-width: 768px;
+            margin: 0 auto 28px;
+            padding: 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-gray);
+            border-radius: var(--radius);
+            display: none;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .typing-indicator.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .typing-text {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: var(--text-white);
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .typing-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--text-white);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 100% { opacity: 0.2; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* Input Area */
+        .input-container {
+            padding: 24px 32px;
+            border-top: 1px solid var(--border-gray);
+            background: var(--bg-dark);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .input-wrapper {
+            max-width: 768px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 20px 140px 20px 24px;
+            background: var(--bg-darker);
+            border: 2px solid var(--border-gray);
+            border-radius: var(--radius);
+            color: var(--text-white);
+            font-size: 16px;
+            resize: none;
+            min-height: 64px;
+            max-height: 200px;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        .input-buttons {
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-btn {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-gray);
+            border: 1px solid var(--border-gray);
+            border-radius: var(--radius);
+            color: var(--text-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: var(--transition);
+        }
+
+        .input-btn:hover {
+            background: var(--hover);
+            border-color: var(--border-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .send-btn {
+            background: var(--pearl-bg);
+            border: none;
+            color: var(--pearl-text);
+            font-weight: 700;
+            width: auto;
+            padding: 0 24px;
+            min-width: 100px;
+        }
+
+        .send-btn:hover {
+            background: var(--text-white);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: var(--shadow);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .input-footer {
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-light);
+            margin-top: 12px;
+            opacity: 0.7;
+        }
+
+        /* Modals */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: var(--glass);
+            border: 1px solid var(--border-gray);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 32px;
+            text-align: center;
+            color: var(--text-white);
+            letter-spacing: -0.5px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 20px;
+            background: var(--bg-darker);
+            border: 2px solid var(--border-gray);
+            border-radius: var(--radius);
+            color: var(--text-white);
+            margin-bottom: 32px;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 20px;
+            background: var(--bg-gray);
+            border: 1px solid var(--border-gray);
+            border-radius: var(--radius);
+            color: var(--text-white);
+            font-size: 16px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .modal-btn:hover {
+            background: var(--hover);
+            border-color: var(--border-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .modal-btn.primary {
+            background: var(--pearl-bg);
+            border: none;
+            color: var(--pearl-text);
+            font-weight: 700;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .modal-btn.primary:hover {
+            background: var(--text-white);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Game Modal */
+        .game-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+        }
+
+        .game-container {
+            background: var(--glass);
+            border: 1px solid var(--border-gray);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            width: 100%;
+            max-width: 640px;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            animation: modalSlideIn 0.4s ease;
+        }
+
+        .game-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 32px;
+            color: var(--text-white);
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        #gameCanvas {
+            border: 2px solid var(--border-gray);
+            background: linear-gradient(135deg, #000000, #1a1a1a);
+            display: block;
+            margin: 0 auto 32px;
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            aspect-ratio: 16/9;
+            box-shadow: var(--shadow);
+        }
+
+        .game-info {
+            text-align: center;
+            margin-bottom: 32px;
+            padding: 24px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-gray);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .game-score {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-white);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .game-score:before {
+            content: "🎯";
+            font-size: 24px;
+        }
+
+        .game-instructions {
+            font-size: 15px;
+            color: var(--text-gray);
+            line-height: 1.6;
+        }
+
+        .game-instructions strong {
+            color: var(--text-white);
+            font-weight: 600;
+        }
+
+        .game-controls {
+            display: flex;
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .game-button {
+            flex: 1;
+            padding: 20px;
+            background: var(--bg-gray);
+            border: 1px solid var(--border-gray);
+            border-radius: var(--radius);
+            color: var(--text-white);
+            font-size: 16px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .game-button:hover {
+            background: var(--hover);
+            border-color: var(--border-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .game-button.primary {
+            background: var(--pearl-bg);
+            border: none;
+            color: var(--pearl-text);
+            font-weight: 700;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .game-button.primary:hover {
+            background: var(--text-white);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Alert */
+        .alert {
+            position: fixed;
+            top: 32px;
+            right: 32px;
+            background: var(--glass);
+            border: 1px solid var(--border-gray);
+            border-left: 4px solid var(--pearl-bg);
+            padding: 20px 24px;
+            border-radius: var(--radius);
+            color: var(--text-white);
+            z-index: 3000;
+            display: none;
+            animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            max-width: 400px;
+            font-weight: 500;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Enhanced floating action button */
+        .fab {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            width: 60px;
+            height: 60px;
+            background: var(--pearl-bg);
+            border: none;
+            border-radius: 50%;
+            color: var(--pearl-text);
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .fab:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: var(--shadow-lg), 0 0 30px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            height: 4px;
+            background: var(--border-gray);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--pearl-bg), #ffffff);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: var(--pearl-bg);
+            color: var(--pearl-text);
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: 12px;
+        }
+
+        /* Gradient borders */
+        .gradient-border {
+            position: relative;
+            border-radius: var(--radius);
+            background: var(--bg-gray);
+        }
+
+        .gradient-border:before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--pearl-bg), transparent, var(--pearl-bg));
+            border-radius: var(--radius);
+            z-index: -1;
+            opacity: 0.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 280px;
+            }
+            
+            .auth-header {
+                padding: 40px 24px 20px;
+            }
+            
+            .auth-content {
+                padding: 24px 24px 40px;
+            }
+            
+            .auth-logo {
+                font-size: 40px;
+            }
+            
+            .chat-header {
+                padding: 16px 20px;
+            }
+            
+            .messages-container {
+                padding: 20px;
+            }
+            
+            .welcome-title {
+                font-size: 48px;
+            }
+            
+            .welcome-subtitle {
+                font-size: 18px;
+            }
+            
+            .message {
+                gap: 16px;
+            }
+            
+            .message-content {
+                padding: 20px;
+                font-size: 15px;
+            }
+            
+            .input-container {
+                padding: 20px;
+            }
+            
+            .chat-input {
+                padding: 18px 120px 18px 20px;
+                font-size: 15px;
+            }
+            
+            .modal-content {
+                padding: 32px 24px;
+            }
+            
+            .game-container {
+                padding: 32px 24px;
+            }
+            
+            .alert {
+                left: 20px;
+                right: 20px;
+                top: 20px;
+            }
+            
+            .fab {
+                bottom: 20px;
+                right: 20px;
+                width: 56px;
+                height: 56px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 260px;
+            }
+            
+            .auth-header {
+                padding: 32px 20px 16px;
+            }
+            
+            .auth-logo {
+                font-size: 36px;
+            }
+            
+            .auth-tagline {
+                font-size: 16px;
+            }
+            
+            .welcome-title {
+                font-size: 36px;
+            }
+            
+            .welcome-subtitle {
+                font-size: 16px;
+            }
+            
+            .message-avatar {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .modal-buttons {
+                flex-direction: column;
+            }
+            
+            .game-controls {
+                flex-direction: column;
+            }
+            
+            .menu-btn {
+                min-width: 44px;
+                min-height: 44px;
+                font-size: 20px;
+            }
+        }
+
+        /* Micro-interactions */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid var(--border-gray);
+            border-top-color: var(--pearl-bg);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Enhanced focus states */
+        *:focus-visible {
+            outline: 2px solid var(--pearl-bg);
+            outline-offset: 2px;
+            border-radius: var(--radius-sm);
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Selection color */
+        ::selection {
+            background: var(--pearl-bg);
+            color: var(--pearl-text);
+        }
+
+        ::-moz-selection {
+            background: var(--pearl-bg);
+            color: var(--pearl-text);
+        }
+    </style>
+</head>
+<body>
+    <!-- Дополнительные элементы для улучшенного UI -->
+    <button class="fab" onclick="toggleSidebar()">☰</button>
+    
+    <!-- Sidebar Menu -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="menu-header">
+            <div class="menu-title">
+                <div class="ai-avatar pulse">L</div>
+                LUMU AI
+                <span class="badge">PRO</span>
+            </div>
+        </div>
+        
+        <div class="menu-section">
+            <div class="menu-section-title">Быстрые действия</div>
+            <div class="menu-items">
+                <button class="menu-item" onclick="openPromoModal()">
+                    <span class="icon">🎁</span>
+                    <span>Активировать промокод</span>
+                </button>
+                <button class="menu-item" onclick="openKeysModal()">
+                    <span class="icon">🔑</span>
+                    <span>Активировать ключ API</span>
+                </button>
+                <button class="menu-item" onclick="newChat()">
+                    <span class="icon">✨</span>
+                    <span>Новая беседа</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="menu-section">
+            <div class="menu-section-title">Статистика</div>
+            <div class="menu-items">
+                <div class="menu-item">
+                    <span class="icon">💬</span>
+                    <div style="flex: 1;">
+                        <div>Сообщений сегодня</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="messagesProgress" style="width: 60%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="menu-footer">
+            <div class="user-info gradient-border" id="sidebarUserInfo">
+                <div class="user-avatar pulse" id="sidebarUserAvatar">U</div>
+                <div class="user-details">
+                    <div class="user-name" id="sidebarUserName">Пользователь</div>
+                    <div class="user-status">
+                        <span class="status-dot"></span>
+                        <span>Online • Премиум</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="menu-actions">
+                <button class="logout-btn" onclick="logout()">
+                    <span class="icon">🚪</span>
+                    <span>Выйти из аккаунта</span>
+                </button>
+                
+                <button class="new-chat-btn" onclick="newChat()">
+                    <span class="icon">+</span>
+                    <span>Новый диалог</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="auth-modal">
+        <div class="auth-container">
+            <div class="auth-header">
+                <div class="auth-logo">LUMU AI</div>
+                <div class="auth-tagline">Интеллектуальный помощник нового поколения</div>
+                <div class="auth-description">
+                    Войдите в систему, чтобы начать диалог с искусственным интеллектом
+                </div>
+            </div>
+            <div class="auth-content">
+                <div class="auth-tabs">
+                    <button class="auth-tab active" id="loginTab" onclick="switchTab('login')">Вход</button>
+                    <button class="auth-tab" id="registerTab" onclick="switchTab('register')">Регистрация</button>
+                </div>
+                
+                <!-- Login Form -->
+                <div id="loginForm" class="auth-form active">
+                    <div class="form-group">
+                        <label class="form-label">Имя пользователя</label>
+                        <input type="text" class="form-input" id="loginUsername" placeholder="Введите имя пользователя">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Пароль</label>
+                        <input type="password" class="form-input" id="loginPassword" placeholder="Введите пароль">
+                    </div>
+                    
+                    <button class="auth-button" id="loginButton" onclick="login()">
+                        <span>Войти в аккаунт</span>
+                    </button>
+                    
+                    <div class="auth-footer">
+                        Нет аккаунта? <a onclick="switchTab('register')">Зарегистрироваться</a>
+                    </div>
+                </div>
+                
+                <!-- Register Form -->
+                <div id="registerForm" class="auth-form">
+                    <div class="form-group">
+                        <label class="form-label">Имя пользователя</label>
+                        <input type="text" class="form-input" id="registerUsername" placeholder="Придумайте имя пользователя">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Пароль</label>
+                        <input type="password" class="form-input" id="registerPassword" placeholder="Создайте пароль">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Подтвердите пароль</label>
+                        <input type="password" class="form-input" id="registerConfirm" placeholder="Повторите пароль">
+                    </div>
+                    
+                    <button class="auth-button" id="registerButton" onclick="register()">
+                        <span>Создать аккаунт</span>
+                    </button>
+                    
+                    <div class="auth-footer">
+                        Уже есть аккаунт? <a onclick="switchTab('login')">Войти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Interface -->
+    <div id="chatContainer" class="chat-container">
+        <div class="chat-header gradient-border">
+            <div class="header-left">
+                <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+                <div class="chat-title">LUMU AI</div>
+            </div>
+        </div>
+        
+        <div class="messages-container" id="messagesContainer">
+            <div class="welcome-container">
+                <h1 class="welcome-title">LUMU AI</h1>
+                <p class="welcome-subtitle">
+                    Интеллектуальный помощник нового поколения. Начните диалог, введя сообщение ниже.
+                </p>
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="typing-text">
+                <span>Идет обработка</span>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <div class="input-wrapper">
+                <textarea 
+                    class="chat-input" 
+                    placeholder="Введите сообщение..."
+                    id="messageInput"
+                    rows="1"
+                ></textarea>
+                <div class="input-buttons">
+                    <button class="input-btn send-btn" onclick="sendMessage()" id="sendBtn">
+                        Отправить
+                    </button>
+                </div>
+            </div>
+            <div class="input-footer">
+                LUMU AI обрабатывает запросы в реальном времени
+            </div>
+        </div>
+    </div>
+
+    <!-- Promo Modal -->
+    <div id="promoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">Активировать промокод</div>
+            <input type="text" class="modal-input" placeholder="Введите промокод" id="promoInput">
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeModal('promoModal')">Отмена</button>
+                <button class="modal-btn primary" onclick="activatePromo()">Активировать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keys Modal -->
+    <div id="keysModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">Активировать ключ API</div>
+            <input type="text" class="modal-input" placeholder="Введите ключ активации" id="keyInput">
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeModal('keysModal')">Отмена</button>
+                <button class="modal-btn primary" onclick="activateKey()">Активировать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Modal -->
+    <div id="gameModal" class="game-modal">
+        <div class="game-container">
+            <div class="game-title">Подтверждение безопасности</div>
+            <canvas id="gameCanvas" width="800" height="450"></canvas>
+            <div class="game-info">
+                <div class="game-score">Нажмите 3 раза на цели чтобы продолжить</div>
+                <div class="game-instructions">
+                    <strong>Инструкция:</strong> Нажимайте на появляющиеся цели
+                </div>
+            </div>
+            <div class="game-controls">
+                <button class="game-button" onclick="resetGame()">Перезапуск</button>
+                <button class="game-button primary" onclick="completeCaptcha()">Продолжить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert -->
+    <div class="alert" id="alert"></div>
+
+    <script>
+        // Глобальные переменные
+        let currentUser = null;
+        let users = {};
+        let chatHistory = [];
+        let attachedFile = null;
+        let gameScore = 0;
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Приложение загружается...');
+            loadData();
+            checkAuth();
+            setupChat();
+            
+            // Закрытие сайдбара при клике на оверлей
+            document.getElementById('sidebarOverlay').addEventListener('click', closeSidebar);
+        });
+
+        // Загрузка данных
+        function loadData() {
+            try {
+                users = JSON.parse(localStorage.getItem('lum_users') || '{}');
+                chatHistory = JSON.parse(localStorage.getItem('chat_history') || '[]');
+                console.log('Загружено пользователей:', Object.keys(users).length);
+            } catch (e) {
+                console.error('Ошибка загрузки:', e);
+                users = {};
+                chatHistory = [];
+            }
+        }
+
+        // Проверка авторизации
+        function checkAuth() {
+            const savedUser = localStorage.getItem('current_user');
+            if (savedUser && users[savedUser]) {
+                currentUser = savedUser;
+                showChat();
+            } else {
+                showAuthModal();
+            }
+        }
+
+        // Показать модалку авторизации
+        function showAuthModal() {
+            document.getElementById('authModal').style.display = 'flex';
+            document.getElementById('chatContainer').style.display = 'none';
+        }
+
+        // Переключение вкладок
+        function switchTab(tab) {
+            // Сброс активных классов
+            document.getElementById('loginTab').classList.remove('active');
+            document.getElementById('registerTab').classList.remove('active');
+            document.getElementById('loginForm').classList.remove('active');
+            document.getElementById('registerForm').classList.remove('active');
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'none';
+
+            if (tab === 'login') {
+                document.getElementById('loginTab').classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+                document.getElementById('loginForm').style.display = 'block';
+            } else {
+                document.getElementById('registerTab').classList.add('active');
+                document.getElementById('registerForm').classList.add('active');
+                document.getElementById('registerForm').style.display = 'block';
+            }
+        }
+
+        // Регистрация
+        function register() {
+            const username = document.getElementById('registerUsername').value.trim();
+            const password = document.getElementById('registerPassword').value.trim();
+            const confirm = document.getElementById('registerConfirm').value.trim();
+
+            if (!username || !password || !confirm) {
+                showAlert('Заполните все поля');
+                return;
+            }
+
+            if (password.length < 6) {
+                showAlert('Пароль должен быть от 6 символов');
+                return;
+            }
+
+            if (password !== confirm) {
+                showAlert('Пароли не совпадают');
+                return;
+            }
+
+            if (users[username]) {
+                showAlert('Это имя пользователя уже занято');
+                return;
+            }
+
+            // Сохраняем пользователя (простое сохранение пароля для демо)
+            users[username] = {
+                password: password,
+                created: new Date().toISOString()
+            };
+
+            // Сохраняем в localStorage
+            localStorage.setItem('lum_users', JSON.stringify(users));
+            
+            // Автоматически входим
+            currentUser = username;
+            localStorage.setItem('current_user', username);
+            
+            showAlert('Регистрация успешна!');
+            
+            // Показываем чат
+            setTimeout(() => {
+                document.getElementById('authModal').style.display = 'none';
+                showChat();
+            }, 1000);
+        }
+
+        // Вход
+        function login() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            if (!username || !password) {
+                showAlert('Заполните все поля');
+                return;
+            }
+
+            const user = users[username];
+            
+            if (!user) {
+                showAlert('Аккаунт не найден');
+                return;
+            }
+
+            // Проверка пароля
+            if (user.password !== password) {
+                showAlert('Неверный пароль');
+                return;
+            }
+
+            currentUser = username;
+            localStorage.setItem('current_user', username);
+            
+            showAlert('Вход выполнен успешно');
+            
+            // Показываем чат
+            setTimeout(() => {
+                document.getElementById('authModal').style.display = 'none';
+                showChat();
+            }, 1000);
+        }
+
+        // Показать чат
+        function showChat() {
+            document.getElementById('authModal').style.display = 'none';
+            document.getElementById('chatContainer').style.display = 'flex';
+            updateSidebarUserInfo();
+            restoreChatHistory();
+        }
+
+        // Обновление информации в сайдбаре
+        function updateSidebarUserInfo() {
+            if (currentUser) {
+                document.getElementById('sidebarUserName').textContent = currentUser;
+                document.getElementById('sidebarUserAvatar').textContent = currentUser.charAt(0).toUpperCase();
+            }
+        }
+
+        // Боковое меню
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            } else {
+                sidebar.classList.add('open');
+                overlay.classList.add('active');
+            }
+        }
+
+        // Закрыть сайдбар
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+        }
+
+        // Выход
+        function logout() {
+            if (confirm('Выйти из аккаунта?')) {
+                localStorage.removeItem('current_user');
+                chatHistory = [];
+                localStorage.removeItem('chat_history');
+                currentUser = null;
+                
+                closeSidebar();
+                document.getElementById('chatContainer').style.display = 'none';
+                showAuthModal();
+                showAlert('Вы вышли из аккаунта');
+            }
+        }
+
+        // Новый чат
+        function newChat() {
+            if (chatHistory.length > 0) {
+                if (confirm('Начать новый диалог?')) {
+                    chatHistory = [];
+                    localStorage.removeItem('chat_history');
+                    document.getElementById('messagesContainer').innerHTML = `
+                        <div class="welcome-container">
+                            <h1 class="welcome-title">LUMU AI</h1>
+                            <p class="welcome-subtitle">
+                                Интеллектуальный помощник нового поколения. Начните диалог, введя сообщение ниже.
+                            </p>
+                        </div>
+                    `;
+                    showAlert('Новый диалог создан');
+                }
+            }
+            closeSidebar();
+        }
+
+        // Настройка чата
+        function setupChat() {
+            const input = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('sendBtn');
+            
+            input.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+                sendBtn.disabled = !this.value.trim();
+            });
+            
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (this.value.trim()) {
+                        sendMessage();
+                    }
+                }
+            });
+        }
+
+        // Отправить сообщение
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            
+            if (!text) return;
+            
+            // Добавляем сообщение пользователя
+            addMessage(text, 'user');
+            chatHistory.push({ sender: 'user', text: text, time: new Date().toISOString() });
+            
+            // Очищаем поле ввода
+            input.value = '';
+            input.style.height = 'auto';
+            document.getElementById('sendBtn').disabled = true;
+            
+            // Показываем индикатор "печатает"
+            showTyping();
+            
+            // Имитация ответа AI
+            setTimeout(() => {
+                hideTyping();
+                const response = getAIResponse(text);
+                addMessage(response, 'ai');
+                chatHistory.push({ sender: 'ai', text: response, time: new Date().toISOString() });
+                
+                // Сохраняем историю
+                localStorage.setItem('chat_history', JSON.stringify(chatHistory));
+            }, 1000 + Math.random() * 1000);
+            
+            scrollToBottom();
+        }
+
+        // Добавить сообщение в UI
+        function addMessage(text, sender) {
+            const container = document.getElementById('messagesContainer');
+            
+            // Убираем приветствие если это первое сообщение
+            if (sender === 'user' && container.querySelector('.welcome-container')) {
+                container.querySelector('.welcome-container').remove();
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const time = new Date().toLocaleTimeString('ru-RU', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
+            let avatarHtml = '';
+            if (sender === 'user') {
+                const userInitial = currentUser ? currentUser.charAt(0).toUpperCase() : 'U';
+                avatarHtml = `<div class="message-avatar">${userInitial}</div>`;
+            } else {
+                avatarHtml = `<div class="message-avatar">L</div>`;
+            }
+            
+            messageDiv.innerHTML = `
+                ${avatarHtml}
+                <div class="message-content-wrapper">
+                    <div class="message-content">${escapeHtml(text)}</div>
+                    <div class="message-time">${time}</div>
+                </div>
+            `;
+            
+            container.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        // Восстановить историю чата
+        function restoreChatHistory() {
+            const container = document.getElementById('messagesContainer');
+            if (chatHistory.length > 0) {
+                container.querySelector('.welcome-container')?.remove();
+                
+                chatHistory.forEach(msg => {
+                    addMessage(msg.text, msg.sender);
+                });
+                
+                scrollToBottom();
+            }
+        }
+
+        // Ответ AI
+        function getAIResponse(userMessage) {
+            const message = userMessage.toLowerCase();
+            
+            if (message.includes('привет')) {
+                return `Здравствуйте${currentUser ? ', ' + currentUser : ''}! Я LUMU AI. Чем могу помочь?`;
+            } else if (message.includes('как дела')) {
+                return `Всё отлично! Работаю в штатном режиме.`;
+            } else if (message.includes('спасибо')) {
+                return `Пожалуйста! Обращайтесь ещё.`;
+            } else if (message.includes('что ты умеешь')) {
+                return `Я могу отвечать на вопросы, помогать с текстом, объяснять сложные темы.`;
+            } else if (message.includes('помощь')) {
+                return `Я здесь, чтобы помочь вам! Вы можете задать мне любой вопрос или воспользоваться функциями в боковом меню.`;
+            }
+            
+            const responses = [
+                "Понял ваш запрос. Вот что я могу сказать...",
+                "Интересный вопрос. Давайте рассмотрим его подробнее.",
+                "Спасибо за обращение. Вот информация:",
+                "Хороший вопрос. Вот мой ответ:",
+                "Принял к рассмотрению ваш запрос...",
+                "Это важная тема. Вот что я нашел:"
+            ];
+            
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        // Показать индикатор печати
+        function showTyping() {
+            document.getElementById('typingIndicator').classList.add('active');
+        }
+
+        // Скрыть индикатор печати
+        function hideTyping() {
+            document.getElementById('typingIndicator').classList.remove('active');
+        }
+
+        // Прокрутка вниз
+        function scrollToBottom() {
+            const container = document.getElementById('messagesContainer');
+            if (container) {
+                setTimeout(() => {
+                    container.scrollTop = container.scrollHeight;
+                }, 100);
+            }
+        }
+
+        // Экранирование HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML.replace(/\n/g, '<br>');
+        }
+
+        // Модальные окна
+        function openPromoModal() {
+            closeSidebar();
+            document.getElementById('promoModal').style.display = 'flex';
+        }
+
+        function openKeysModal() {
+            closeSidebar();
+            document.getElementById('keysModal').style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function activatePromo() {
+            const promoCode = document.getElementById('promoInput').value.trim().toUpperCase();
+            const validCodes = ['LUMU2024', 'AIHELP', 'PROMO100'];
+            
+            if (validCodes.includes(promoCode)) {
+                showAlert('Промокод успешно активирован!');
+                closeModal('promoModal');
+            } else {
+                showAlert('Неверный промокод');
+            }
+        }
+
+        function activateKey() {
+            const apiKey = document.getElementById('keyInput').value.trim();
+            const validKeys = ['API-KEY-2024-LUMU', 'LUMU-API-PRO'];
+            
+            if (validKeys.includes(apiKey)) {
+                showAlert('Ключ API успешно активирован!');
+                closeModal('keysModal');
+            } else {
+                showAlert('Неверный ключ API');
+            }
+        }
+
+        // Капча (упрощенная)
+        function startCaptcha() {
+            document.getElementById('authModal').style.display = 'none';
+            document.getElementById('gameModal').style.display = 'flex';
+            gameScore = 0;
+            setupGame();
+        }
+
+        function setupGame() {
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Простая игра: нужно кликнуть 3 раза по canvas
+            canvas.onclick = function(e) {
+                gameScore++;
+                document.querySelector('.game-score').textContent = `Кликов: ${gameScore}/3`;
+                
+                if (gameScore >= 3) {
+                    showAlert('Проверка пройдена!');
+                    setTimeout(completeCaptcha, 1000);
+                }
+            };
+        }
+
+        function resetGame() {
+            gameScore = 0;
+            document.querySelector('.game-score').textContent = `Кликов: 0/3`;
+        }
+
+        function completeCaptcha() {
+            document.getElementById('gameModal').style.display = 'none';
+            showChat();
+        }
+
+        // Уведомления
+        function showAlert(message) {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 3000);
+        }
+
+        // Закрытие модалок по клику на фон
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal') || 
+                e.target.classList.contains('game-modal') ||
+                e.target.classList.contains('auth-modal')) {
+                e.target.style.display = 'none';
+            }
+        });
+
+        // Закрытие по Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal, .game-modal, .auth-modal').forEach(modal => {
+                    modal.style.display = 'none';
+                });
+                closeSidebar();
+            }
+        });
+    </script>
+</body>
+</html>
