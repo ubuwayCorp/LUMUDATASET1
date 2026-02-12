@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>UbuTeacher — Всё в одном: колесо, журнал, рассадка, фразы</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ===== КОМПАКТНЫЕ ПЕРЕМЕННЫЕ ===== */
+        :root {
+            --white: #FFFFFF;
+            --black: #0A0A0A;
+            --purple: #8B3DFF;
+            --purple-light: rgba(139, 61, 255, 0.08);
+            --purple-medium: rgba(139, 61, 255, 0.15);
+            --purple-dark: #6D28D9;
+            --gray-bg: #F8FAFC;
+            --gray-border: #E2E8F0;
+            --gray-text: #475569;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+            --shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+            --radius: 10px;
+            --radius-lg: 14px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--white);
+            color: var(--black);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            font-size: 14px;
+        }
+
+        /* ===== ФИОЛЕТОВЫЕ ПЯТНА (усилены) ===== */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 5% 20%, rgba(139, 61, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 95% 80%, rgba(139, 61, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 20% 70%, rgba(139, 61, 255, 0.07) 0%, transparent 55%),
+                radial-gradient(circle at 80% 30%, rgba(139, 61, 255, 0.07) 0%, transparent 55%),
+                radial-gradient(circle at 50% 50%, rgba(139, 61, 255, 0.05) 0%, transparent 60%);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        /* ===== ПРИВЕТСТВИЕ ===== */
+        .welcome-screen {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            text-align: center;
+            animation: fadeScale 0.6s ease;
+        }
+
+        .welcome-logo {
+            font-size: 3.2rem;
+            color: var(--purple);
+            margin-bottom: 20px;
+            animation: float 3s infinite;
+        }
+
+        .welcome-title {
+            font-size: 2.4rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            opacity: 0;
+            animation: slideUp 0.6s 0.2s forwards;
+        }
+
+        .welcome-subtitle {
+            font-size: 1rem;
+            color: var(--gray-text);
+            max-width: 420px;
+            margin-bottom: 32px;
+            line-height: 1.5;
+            opacity: 0;
+            animation: slideUp 0.6s 0.4s forwards;
+        }
+
+        .start-button {
+            background: var(--purple);
+            color: white;
+            border: none;
+            padding: 14px 36px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            animation: slideUp 0.6s 0.6s forwards;
+            box-shadow: 0 6px 14px rgba(139, 61, 255, 0.25);
+            transition: 0.2s;
+        }
+
+        .start-button:hover {
+            background: var(--purple-dark);
+            transform: translateY(-2px);
+        }
+
+        /* ===== ОСНОВНОЙ КОНТЕЙНЕР — УЗКИЙ ===== */
+        .main-container {
+            display: none;
+            min-height: 100vh;
+            padding: 16px 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* ===== ВЕРХНЯЯ ПАНЕЛЬ ===== */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            margin-bottom: 20px;
+            border-bottom: 1.5px solid var(--gray-border);
+        }
+
+        .back-button {
+            width: 38px;
+            height: 38px;
+            border: 1.5px solid var(--black);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        .back-button:hover {
+            background: var(--black);
+            color: white;
+        }
+
+        .page-header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        /* ===== ГРИД МЕНЮ — 2 КОЛОНКИ ===== */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin: 16px 0 30px;
+        }
+
+        @media (max-width: 640px) {
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .menu-card {
+            background: white;
+            border: 1.5px solid var(--gray-border);
+            border-radius: var(--radius-lg);
+            padding: 18px 16px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .menu-card:hover {
+            border-color: var(--purple);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .menu-icon {
+            font-size: 1.8rem;
+            color: var(--purple);
+            margin-bottom: 12px;
+        }
+
+        .menu-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .menu-desc {
+            color: var(--gray-text);
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        /* ===== КНОПКИ ===== */
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.15s;
+        }
+
+        .btn-primary {
+            background: var(--purple);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--purple-dark);
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1.5px solid var(--gray-border);
+            color: var(--black);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--purple);
+        }
+
+        .btn-success {
+            background: var(--green);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--red);
+            color: white;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.75rem;
+        }
+
+        .input-field {
+            padding: 10px 14px;
+            border: 1.5px solid var(--gray-border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        .input-field:focus {
+            border-color: var(--purple);
+            outline: none;
+        }
+
+        /* ===== КОЛЕСО ===== */
+        .wheel-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wheel-wrapper {
+            position: relative;
+            width: min(380px, 90vw);
+            height: min(380px, 90vw);
+            margin: 0 auto 20px;
+        }
+
+        #wheelCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 6px solid var(--black);
+            box-shadow: var(--shadow);
+            transition: transform 0.1s linear;
+        }
+
+        .wheel-pointer-big {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px;
+            color: var(--purple);
+            z-index: 20;
+        }
+
+        .wheel-result {
+            font-size: 1.4rem;
+            font-weight: 700;
+            padding: 14px 28px;
+            background: var(--purple-light);
+            border: 1.5px solid var(--purple);
+            border-radius: 40px;
+            margin: 15px 0 25px;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .students-list {
+            background: white;
+            border: 1.5px solid var(--gray-border);
+            border-radius: 10px;
+            max-height: 180px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .student-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--gray-border);
+        }
+
+        .student-item:last-child {
+            border-bottom: none;
+        }
+
+        /* ===== БЛОКНОТ ===== */
+        .notes-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 20px;
+            height: 60vh;
+            min-height: 400px;
+        }
+
+        @media (max-width: 768px) {
+            .notes-layout {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+        }
+
+        .notes-sidebar {
+            background: white;
+            border: 1.5px solid var(--gray-border);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .notes-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .note-item {
+            padding: 14px;
+            border-bottom: 1px solid var(--gray-border);
+            cursor: pointer;
+            border-radius: 8px;
+            margin-bottom: 4px;
+        }
+
+        .note-item:hover {
+            background: var(--purple-light);
+        }
+
+        .note-item.active {
+            background: var(--purple-medium);
+            border-left: 4px solid var(--purple);
+        }
+
+        .note-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+
+        .note-preview {
+            font-size: 0.75rem;
+            color: var(--gray-text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .note-date {
+            font-size: 0.65rem;
+            color: #94A3B8;
+            margin-top: 5px;
+        }
+
+        .note-editor {
+            background: white;
+            border: 1.5px solid var(--gray-border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .note-textarea {
+            width: 100%;
+            height: 250px;
+            padding: 16px;
+            border: 1.5px solid var(--gray-border);
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            resize: vertical;
+            margin-bottom: 16px;
+        }
+
+        /* ===== ТАБЛИЦЫ ===== */
+        .compact-table {
+            width: 100%;
+            background: white;
+            border: 1.5px solid var(--gray-border);
+            border-radius: 10px;
+            overflow: hidden;
+            font-size: 0.85rem;
+        }
+
+        .compact-table th {
+            background: var(--purple);
+            color: white;
+            padding: 12px;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .compact-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--gray-border);
+        }
+
+        /* ===== СЧЕТЧИК ОЦЕНОК ===== */
+        .grades-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .grades-colors {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .grade-box {
+            padding: 16px 8px;
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+            font-weight: 700;
+        }
+
+        .grade-2 { background: #EF4444; }
+        .grade-3 { background: #F59E0B; }
+        .grade-4 { background: #FBBF24; color: black; }
+        .grade-5 { background: #10B981; }
+
+        /* ===== УЧЕТ ДЕНЕГ ===== */
+        .money-summary {
+            background: var(--purple-light);
+            border: 1.5px solid var(--purple);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .money-stat {
+            text-align: center;
+        }
+
+        .money-stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--purple);
+        }
+
+        .money-stat-label {
+            font-size: 0.8rem;
+            color: var(--gray-text);
+        }
+
+        /* ===== ГЕНЕРАТОР ФРАЗ ===== */
+        .phrases-container {
+            background: white;
+            border: 1.5px solid var(--gray-border);
+            border-radius: var(--radius-lg);
+            padding: 25px;
+        }
+
+        .phrase-categories {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .category-btn {
+            padding: 10px 18px;
+            border: 1.5px solid var(--gray-border);
+            border-radius: 30px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+
+        .category-btn.active {
+            background: var(--purple);
+            color: white;
+            border-color: var(--purple);
+        }
+
+        .phrase-card {
+            background: var(--purple-light);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1.5px solid var(--purple);
+        }
+
+        .phrase-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .phrase-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .phrases-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .phrase-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px;
+            background: white;
+            border: 1.5px solid var(--gray-border);
+            border-radius: 10px;
+        }
+
+        .phrase-item-text {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .custom-name-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        /* ===== ФУТЕР ===== */
+        .footer {
+            margin-top: 50px;
+            padding: 24px 0 16px;
+            border-top: 1.5px solid var(--gray-border);
+            text-align: center;
+        }
+
+        .footer-text {
+            color: var(--gray-text);
+            font-size: 0.75rem;
+            margin-bottom: 16px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+        }
+
+        .footer-link {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--purple);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: 0.2s;
+        }
+
+        .footer-link:hover {
+            background: var(--purple-dark);
+            transform: translateY(-2px);
+        }
+
+        /* ===== АНИМАЦИИ ===== */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeScale {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .mt-20 { margin-top: 20px; }
+        .mb-20 { margin-bottom: 20px; }
+        .w-100 { width: 100%; }
+    </style>
+</head>
+<body>
+
+<!-- ===== ПРИВЕТСТВИЕ ===== -->
+<div class="welcome-screen" id="welcomeScreen">
+    <div class="welcome-logo">
+        <i class="fas fa-chalkboard-teacher"></i>
+    </div>
+    <h1 class="welcome-title">UbuTeacher</h1>
+    <p class="welcome-subtitle">Бесплатный инструмент современных учителей.</p>
+    <button class="start-button" onclick="startOS()">
+        <span>Начать работу</span>
+        <i class="fas fa-arrow-right"></i>
+    </button>
+</div>
+
+<!-- ===== ОСНОВНОЙ ИНТЕРФЕЙС ===== -->
+<div class="main-container" id="mainContainer">
+    
+    <!-- ===== МЕНЮ (7 модулей) ===== -->
+    <div class="page-content" id="menuPage">
+        <div class="top-bar">
+            <div></div>
+            <div class="page-header"><h1>UbuTeacher</h1></div>
+            <div></div>
+        </div>
+        <div class="menu-grid">
+            <div class="menu-card" onclick="showPage('wheelPage')">
+                <div class="menu-icon"><i class="fas fa-dharmachakra"></i></div>
+                <div class="menu-title">Колесо удачи</div>
+                <div class="menu-desc">Случайный выбор ученика с анимацией</div>
+            </div>
+            <div class="menu-card" onclick="showPage('journalPage')">
+                <div class="menu-icon"><i class="fas fa-robot"></i></div>
+                <div class="menu-title">Бот-журнал</div>
+                <div class="menu-desc">Анализ оценок, кого спросить на уроке</div>
+            </div>
+            <div class="menu-card" onclick="showPage('notebookPage')">
+                <div class="menu-icon"><i class="fas fa-book"></i></div>
+                <div class="menu-title">Блокнот</div>
+                <div class="menu-desc">Заметки с автосохранением в браузере</div>
+            </div>
+            <div class="menu-card" onclick="showPage('timerPage')">
+                <div class="menu-icon"><i class="fas fa-stopwatch"></i></div>
+                <div class="menu-title">Таймер</div>
+                <div class="menu-desc">Обратный отсчет для тестов и работ</div>
+            </div>
+            <div class="menu-card" onclick="showPage('gradesPage')">
+                <div class="menu-icon"><i class="fas fa-calculator"></i></div>
+                <div class="menu-title">Счетчик оценок</div>
+                <div class="menu-desc">Статистика за четверть, средний балл</div>
+            </div>
+            <div class="menu-card" onclick="showPage('moneyPage')">
+                <div class="menu-icon"><i class="fas fa-money-bill-wave"></i></div>
+                <div class="menu-title">Учет денег</div>
+                <div class="menu-desc">Сдал/Не сдал, экспорт в CSV и PNG</div>
+            </div>
+            <div class="menu-card" onclick="showPage('phrasesPage')">
+                <div class="menu-icon"><i class="fas fa-message"></i></div>
+                <div class="menu-title">Генератор фраз</div>
+                <div class="menu-desc">Современные формулировки для родителей</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 1. КОЛЕСО УДАЧИ ===== -->
+    <div class="page-content hidden" id="wheelPage">
+        <div class="top-bar">
+            <button class="back-button" onclick="showPage('menuPage')"><i class="fas fa-arrow-left"></i></button>
+            <div class="page-header"><h1>Колесо удачи</h1></div>
+            <div></div>
+        </div>
+        <div class="wheel-container">
+            <div class="wheel-wrapper">
+                <div class="wheel-pointer-big"><i class="fas fa-caret-down"></i></div>
+                <canvas id="wheelCanvas" width="400" height="400"></canvas>
+            </div>
+            <div class="wheel-result" id="wheelResult">👆 Нажми "Крутить"</div>
+            
+            <div style="width:100%; max-width:400px;">
+                <div style="display:flex; gap:10px; margin-bottom:16px;">
+                    <input type="text" id="wheelStudentInput" class="input-field" placeholder="Имя ученика">
+                    <button class="btn btn-primary" onclick="addWheelStudent()"><i class="fas fa-plus"></i></button>
+                </div>
+                <div class="students-list" id="wheelStudentsList"></div>
+                <button class="btn btn-primary w-100" style="padding:14px;" onclick="spinWheel()">
+                    <i class="fas fa-redo"></i> Крутить колесо
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 2. БОТ-ЖУРНАЛ ===== -->
+    <div class="page-content hidden" id="journalPage">
+        <div class="top-bar">
+            <button class="back-button" onclick="showPage('menuPage')"><i class="fas fa-arrow-left"></i></button>
+            <div class="page-header"><h1>Бот-журнал</h1></div>
+            <div></div>
+        </div>
+        <div style="max-width:700px; margin:0 auto;">
+            <div style="background:var(--purple-light); border:1.5px solid var(--purple); border-radius:12px; padding:18px; margin-bottom:25px; text-align:center;">
+                <div style="font-size:1.5rem; font-weight:700;" id="journalResult">К доске: —</div>
+            </div>
+            
+            <div style="display:grid; grid-template-columns:2fr 2fr 1fr; gap:12px; margin-bottom:20px;">
+                <input type="text" id="journalNameInput" class="input-field" placeholder="Имя">
+                <input type="text" id="journalGradesInput" class="input-field" placeholder="5 4 3">
+                <button class="btn btn-primary" onclick="addJournalStudent()"><i class="fas fa-plus"></i></button>
+            </div>
+            
+            <table class="compact-table">
+                <thead><tr><th>Ученик</th><th>Оценки</th><th>Ср.</th><th></th></tr></thead>
+                <tbody id="journalStudentsList"></tbody>
+            </table>
+            
+            <button class="btn btn-primary w-100 mt-20" style="padding:14px;" onclick="calculateJournal()">
+                <i class="fas fa-brain"></i> Кого спросить?
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== 3. БЛОКНОТ ===== -->
+    <div class="page-content hidden" id="notebookPage">
+        <div class="top-bar">
+            <button class="back-button" onclick="showPage('menuPage')"><i class="fas fa-arrow-left"></i></button>
+            <div class="page-header"><h1>Блокнот</h1></div>
+            <div></div>
+        </div>
+        <div class="notes-layout">
+            <div class="notes-sidebar">
+                <div style="padding:16px; border-bottom:1.5px solid var(--gray-border);">
+                    <button class="btn btn-primary w-100" onclick="createNote()">
+                        <i class="fas fa-plus"></i> Новая запись
+                    </button>
+                </div>
+                <div class="notes-list" id="notesList"></div>
+            </div>
+            <div class="note-editor">
+                <textarea class="note-textarea" id="noteTextarea" placeholder="Введите текст заметки..."></textarea>
+                <div style="display:flex; gap:12px; justify-content:flex-end;">
+                    <button class="btn btn-danger btn-small" onclick="deleteCurrentNote()"><i class="fas fa-trash"></i> Удалить</button>
+                    <button class="btn btn-primary btn-small" onclick="saveNote()"><i class="fas fa-save"></i> Сохранить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 4. ТАЙМЕР ===== -->
+    <div class="page-content hidden" id="timerPage">
+        <div class="top-bar">
+            <button class="back-button" onclick="showPage('menuPage')"><i class="fas fa-arrow-left"></i></button>
+            <div class="page-header"><h1>Таймер</h1></div>
+            <div></div>
+        </div>
+        <div style="max-width:450px; margin:0 auto;">
+            <div style="display:flex; gap:12px; justify-content:center; margin-bottom:25px;">
+                <div style="text-align:center;">
+                    <input type="number" id="hoursInput" class="input-field" style="width:70px; font-size:1.5rem; text-align:center;" value="0">
+                    <div style="font-size:0.7rem; margin-top:4px;">Часы</div>
+                </div>
+                <div style="text-align:center;">
+                    <input type="number" id="minutesInput" class="input-field" style="width:70px; font-size:1.5rem; text-align:center;" value="10">
+                    <div style="font-size:0.7rem; margin-top:4px;">Минуты</div>
+                </div>
+                <div style="text-align:center;">
+                    <input type="number" id="secondsInput" class="input-field" style="width:70px; font-size:1.5rem; text-align:center;" value="0">
+                    <div style="font-size:0.7rem; margin-top:4px;">Секунды</div>
+                </div>
+            </div>
+            <div style="font-size:3.5rem; font-family:'JetBrains Mono'; text-align:center; margin:25px 0;" id="timerDisplay">10:00</div>
+            <div style="display:flex; gap:12px; justify-content:center;">
+                <button class="btn btn-primary" onclick="startTimer()">▶</button>
+                <button class="btn btn-outline" onclick="pauseTimer()"> ■</button>
+                <button class="btn btn-outline" onclick="resetTimer()">↻</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 5. СЧЕТЧИК ОЦЕНОК ===== -->
+    <div class="page-content hidden" id="gradesPage">
+        <div class="top-bar">
+            <button class="back-button" onclick="showPage('menuPage')"><i class="fas fa-arrow-left"></i></button>
+            <div class="page-header"><h1>Счетчик оценок</h1></div>
+            <div></div>
+        </div>
+        <div style="max-width:450px; margin:0 auto;">
+            <input type="text" id="gradesInput" class="input-field" style="padding:14px; font-size:1rem; margin-bottom:25px;" placeholder="5 4 3 5 4" value="5 4 5 3 4" oninput="calculateGrades()">
+            
+            <div class="grades-grid">
+                <div style="background:white; border:1.5px solid var(--gray-border); border-radius:10px; padding:18px; text-align:center;">
+                    <div style="font-size:2rem; font-weight:700;" id="averageGrade">4.20</div>
+                    <div style="font-size:0.8rem; color:var(--gray-text);">Средний балл</div>
+                </div>
+                <div style="background:white; border:1.5px solid var(--gray-border); border-radius:10px; padding:18px; text-align:center;">
+                    <div style="font-size:2rem; font-weight:700;" id="totalGrades">5</div>
+                    <div style="font-size:0.8rem; color:var(--gray-text);">Всего оценок</div>
+                </div>
+            </div>
+            
+            <div class="grades-colors">
+                <div class="grade-box grade-2">
+                    <div style="font-size:1.6rem; font-weight:700;" id="count2">0</div>
+                    <div style="font-size:0.75rem;">Двойки</div>
+                </div>
+                <div class="grade-box grade-3">
+                    <div style="font-size:1.6rem; font-weight:700;" id="count3">0</div>
+                    <div style="font-size:0.75rem;">Тройки</div>
+                </div>
+                <div class="grade-box grade-4">
+                    <div style="font-size:1.6rem; font-weight:700;" id="count4">2</div>
+                    <div style="font-size:0.75rem;">Четверки</div>
+                </div>
+                <div class="grade-box grade-5">
+                    <div style="font-size:1.6rem; font-weight:700;" id="count5">3</div>
+                    <div style="font-size:0.75rem;">Пятерки</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 6. УЧЕТ ДЕНЕГ ===== -->
+    <div class="page-content hidden" id="moneyPage">
+        <div class="top-bar">
+            <button class="back-button" onclick="showPage('menuPage')"><i class="fas fa-arrow-left"></i></button>
+            <div class="page-header"><h1>Учет денег</h1></div>
+            <div></div>
+        </div>
+        <div style="max-width:700px; margin:0 auto;">
+            <!-- Статистика -->
+            <div class="money-summary">
+                <div class="money-stat">
+                    <div class="money-stat-value" id="totalStudents">0</div>
+                    <div class="money-stat-label">Всего учеников</div>
+                </div>
+                <div class="money-stat">
+                    <div class="money-stat-value" id="paidCount">0</div>
+                    <div class="money-stat-label">Сдали</div>
+                </div>
+                <div class="money-stat">
+                    <div class="money-stat-value" id="unpaidCount">0</div>
+                    <div class="money-stat-label">Не сдали</div>
+                </div>
+                <div class="money-stat">
+                    <div class="money-stat-value" id="collectionPercent">0%</div>
+                    <div class="money-stat-label">Собираемость</div>
+                </div>
+            </div>
+            
+            <div style="display:flex; gap:12px; margin-bottom:20px;">
+                <input type="text" id="moneyStudentInput" class="input-field" placeholder="Имя ученика">
+                <button class="btn btn-primary" onclick="addMoneyStudent()"><i class="fas fa-plus"></i></button>
+            </div>
+            
+            <div style="display:flex; gap:12px; margin-bottom:20px; justify-content:flex-end;">
+                <button class="btn btn-success btn-small" onclick="markAllPaid()">
+                    <i class="fas fa-check-double"></i> Все сдали
+                </button>
+                <button class="btn btn-outline btn-small" onclick="markAllUnpaid()">
+                    <i class="fas fa-times"></i> Все не сдали
+                </button>
+            </div>
+            
+            <table class="compact-table">
+                <thead><tr><th>Ученик</th><th>Статус</th><th>Действия</th></tr></thead>
+                <tbody id="moneyStudentsList"></tbody>
+            </table>
+            
+            <div style="display:flex; gap:12px; justify-content:center; margin-top:25px;">
+                <button class="btn btn-primary btn-small" onclick="exportToCSV()">
+                    <i class="fas fa-file-csv"></i> Экспорт CSV
+                </button>
+                <button class="btn btn-primary btn-small" onclick="exportToPNG()">
+                    <i class="fas fa-file-image"></i> Экспорт PNG
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 7. ГЕНЕРАТОР СОВРЕМЕННЫХ ФРАЗ ===== -->
+    <div class="page-content hidden" id="phrasesPage">
+        <div class="top-bar">
+            <button class="back-button" onclick="showPage('menuPage')"><i class="fas fa-arrow-left"></i></button>
+            <div class="page-header"><h1>Генератор фраз</h1></div>
+            <div></div>
+        </div>
+        
+        <div class="phrases-container">
+            <div class="phrase-categories">
+                <button class="category-btn active" onclick="changePhraseCategory('praise')">✨ Похвала</button>
+                <button class="category-btn" onclick="changePhraseCategory('concern')">🤔 Беспокойство</button>
+                <button class="category-btn" onclick="changePhraseCategory('homework')">📚 Домашнее задание</button>
+                <button class="category-btn" onclick="changePhraseCategory('behavior')">🎭 Поведение</button>
+                <button class="category-btn" onclick="changePhraseCategory('progress')">📈 Прогресс</button>
+            </div>
+            
+            <!-- Ввод своего имени -->
+            <div class="custom-name-input">
+                <input type="text" id="customNameInput" class="input-field" placeholder="Введите имя ученика" value="Александра">
+                <button class="btn btn-outline" onclick="setCustomName()">
+                    <i class="fas fa-user"></i> Применить
+                </button>
+                <button class="btn btn-outline" onclick="resetCustomName()">
+                    <i class="fas fa-undo"></i> Сброс
+                </button>
+            </div>
+            
+            <div class="phrase-card">
+                <div class="phrase-text" id="currentPhrase">
+                    «Александра проявляет искренний интерес к предмету и активно участвует в обсуждениях. Очень приятно видеть такую вовлечённость!»
+                </div>
+                <div class="phrase-actions">
+                    <button class="btn btn-outline btn-small" onclick="copyPhrase()">
+                        <i class="fas fa-copy"></i> Копировать
+                    </button>
+                    <button class="btn btn-primary btn-small" onclick="generatePhrase()">
+                        <i class="fas fa-sync"></i> Другая фраза
+                    </button>
+                </div>
+            </div>
+            
+            <h4 style="margin-bottom:15px;">Ещё варианты</h4>
+            <div class="phrases-list" id="phrasesList"></div>
+        </div>
+    </div>
+
+    <!-- ===== ФУТЕР ===== -->
+    <div class="footer">
+        <div class="footer-text">
+            <p>UbuTeacher © 2026 — Все данные в браузере, ничего не теряется</p>
+            <p>Создатель: Ubuway</p>
+        </div>
+        <div class="footer-links">
+            <a href="https://t.me/Ubuway" class="footer-link" target="_blank"><i class="fab fa-telegram"></i></a>
+            <a href="mailto:ubuwaycorp@gmail.com" class="footer-link"><i class="fas fa-envelope"></i></a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==================== ГЛОБАЛЬНЫЕ ДАННЫЕ ====================
+    // КОЛЕСО
+    let wheelStudents = [];
+    
+    // ЖУРНАЛ
+    let journalStudents = [];
+    
+    // БЛОКНОТ
+    let notes = [];
+    let currentNoteId = null;
+    
+    // ДЕНЬГИ
+    let moneyStudents = [];
+    
+    // ТАЙМЕР
+    let timerSeconds = 600;
+    let timerInterval = null;
+    let isTimerRunning = false;
+    
+    // ФРАЗЫ
+    let currentCategory = 'praise';
+    let currentCustomName = 'Александра';
+    
+    const phrases = {
+        praise: [
+            '{name} проявляет искренний интерес к предмету и активно участвует в обсуждениях.',
+            'Радует, что {name} всегда подготовлен(а) и выполняет задания с душой.',
+            'У {name} отличная динамика — виден прогресс и желание учиться.',
+            '{name} — настоящий помощник на уроке, всегда готов(а) прийти на помощь одноклассникам.',
+            'Очень ценю в {name} внимательность и ответственный подход к учёбе.',
+            '{name} умеет мыслить нестандартно — это большой талант!',
+            'Благодарю {name} за активную работу и интересные вопросы на уроке.',
+            '{name} показывает стабильно высокие результаты и не останавливается на достигнутом.'
+        ],
+        concern: [
+            'В последнее время {name} стал(а) менее внимателен(а) на уроках, давайте обсудим, как помочь.',
+            'Оценки {name} снизились — возможно, стоит уделить больше времени домашним заданиям.',
+            '{name} часто отвлекается, давайте вместе подумаем, как повысить концентрацию.',
+            'Вижу, что {name} способен(на) на большее, давайте поддержим его/её.',
+            '{name} пропустил(а) несколько важных тем — предлагаю дополнительное занятие.',
+            'Мне кажется, {name} неуверенно чувствует себя на уроках, важно создать комфортную среду.',
+            '{name} стал(а) реже поднимать руку — возможно, нужна дополнительная поддержка.',
+            'У {name} появились сложности с дисциплиной, давайте мягко скорректируем поведение.'
+        ],
+        homework: [
+            '{name} всегда добросовестно выполняет домашние задания — это очень помогает в учёбе.',
+            'Обратите внимание: {name} не полностью выполнил(а) домашнюю работу, давайте разберёмся.',
+            'Домашнее задание у {name} выполнено творчески — отдельное спасибо за старание.',
+            '{name} забывает записывать домашнее задание — буду благодарен(на) за контроль с вашей стороны.',
+            'Благодарю за то, что {name} всегда приходит с выполненным домашним заданием.',
+            '{name} проявил(а) инициативу и сделал(а) дополнительное задание — это достойно уважения!',
+            'Домашние работы {name} выполнены аккуратно, видно старание.',
+            '{name} иногда сдаёт работы позже срока — давайте договоримся о дедлайнах.'
+        ],
+        behavior: [
+            '{name} отлично взаимодействует с одноклассниками, помогает и поддерживает других.',
+            '{name} стал(а) более сдержан(а) и уважительно относится к мнению других.',
+            'В поведении {name} появилась большая осознанность — это радует.',
+            '{name} иногда нарушает дисциплину, давайте обсудим правила поведения в классе.',
+            'Благодарю {name} за уважительное отношение к учителю и одноклассникам.',
+            '{name} умеет работать в команде и брать на себя ответственность.',
+            '{name} стал(а) примером для других в плане дисциплины.',
+            'Вижу положительные изменения в поведении {name} — продолжаем в том же духе!'
+        ],
+        progress: [
+            'У {name} значительный прогресс за последнюю четверть — горжусь успехами!',
+            '{name} подтянул(а) знания по сложной теме — это большой труд.',
+            'Раньше {name} испытывал(а) трудности, а теперь уверенно справляется сам(а).',
+            'Заметен рост успеваемости у {name} — так держать!',
+            '{name} стал(а) увереннее отвечать у доски, преодолел(а) стеснение.',
+            'Качество работ {name} значительно улучшилось — видно усердие.',
+            '{name} догнал(а) программу и теперь чувствует себя уверенно.',
+            'Прогресс {name} вдохновляет — ещё немного и будет отличный результат!'
+        ]
+    };
+
+    // ==================== ЗАГРУЗКА/СОХРАНЕНИЕ ====================
+    function loadFromStorage() {
+        try {
+            wheelStudents = JSON.parse(localStorage.getItem('ubu_wheel')) || [];
+            journalStudents = JSON.parse(localStorage.getItem('ubu_journal')) || [];
+            notes = JSON.parse(localStorage.getItem('ubu_notes')) || [];
+            moneyStudents = JSON.parse(localStorage.getItem('ubu_money')) || [];
+        } catch(e) {}
+        
+        // Данные по умолчанию
+        if (!wheelStudents.length) wheelStudents = [
+            {id: 1, name: 'Иванов', color: '#8B3DFF'},
+            {id: 2, name: 'Петрова', color: '#6D28D9'},
+            {id: 3, name: 'Сидоров', color: '#5B21B6'}
+        ];
+        
+        if (!journalStudents.length) journalStudents = [
+            {id: 1, name: 'Иванов', grades: [5,4,5]},
+            {id: 2, name: 'Петрова', grades: [4,3,4]},
+            {id: 3, name: 'Сидоров', grades: [3,2,3]}
+        ];
+        
+        if (!notes.length) notes = [
+            {id: 1, title: 'План урока', content: '1. Проверка дз\n2. Новая тема\n3. Самостоятельная работа', date: new Date().toLocaleString('ru')}
+        ];
+        
+        if (!moneyStudents.length) moneyStudents = [
+            {id: 1, name: 'Иванов', paid: true},
+            {id: 2, name: 'Петрова', paid: false},
+            {id: 3, name: 'Сидоров', paid: true},
+            {id: 4, name: 'Смирнова', paid: false},
+            {id: 5, name: 'Кузнецов', paid: true}
+        ];
+    }
+
+    function saveWheel() { localStorage.setItem('ubu_wheel', JSON.stringify(wheelStudents)); }
+    function saveJournal() { localStorage.setItem('ubu_journal', JSON.stringify(journalStudents)); }
+    function saveNotes() { localStorage.setItem('ubu_notes', JSON.stringify(notes)); }
+    function saveMoney() { localStorage.setItem('ubu_money', JSON.stringify(moneyStudents)); }
+
+    // ==================== НАВИГАЦИЯ ====================
+    function startOS() {
+        document.getElementById('welcomeScreen').style.display = 'none';
+        document.getElementById('mainContainer').style.display = 'block';
+        loadFromStorage();
+        showPage('menuPage');
+    }
+
+    function showPage(pageId) {
+        document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+        document.getElementById(pageId).classList.remove('hidden');
+        
+        // Обновляем данные при открытии страниц
+        if (pageId === 'wheelPage') { drawWheel(); renderWheelStudents(); }
+        if (pageId === 'journalPage') renderJournalStudents();
+        if (pageId === 'notebookPage') renderNotesList();
+        if (pageId === 'moneyPage') { renderMoneyStudents(); updateMoneyStats(); }
+        if (pageId === 'gradesPage') calculateGrades();
+        if (pageId === 'timerPage') updateTimerDisplay();
+        if (pageId === 'phrasesPage') { 
+            document.getElementById('customNameInput').value = currentCustomName;
+            renderPhrasesList(); 
+            generatePhrase();
+        }
+    }
+
+    // ==================== 1. КОЛЕСО ====================
+    function addWheelStudent() {
+        let inp = document.getElementById('wheelStudentInput');
+        let name = inp.value.trim();
+        if (!name) return;
+        wheelStudents.push({ 
+            id: Date.now(), 
+            name, 
+            color: ['#8B3DFF','#6D28D9','#5B21B6','#4C1D95','#7C3AED'][wheelStudents.length % 5] 
+        });
+        inp.value = '';
+        saveWheel();
+        drawWheel();
+        renderWheelStudents();
+    }
+
+    function deleteWheelStudent(id) {
+        wheelStudents = wheelStudents.filter(s => s.id !== id);
+        saveWheel();
+        drawWheel();
+        renderWheelStudents();
+    }
+
+    function renderWheelStudents() {
+        let list = document.getElementById('wheelStudentsList');
+        if (!list) return;
+        list.innerHTML = '';
+        wheelStudents.forEach(s => {
+            let div = document.createElement('div');
+            div.className = 'student-item';
+            div.innerHTML = `<span>${s.name}</span>
+                <button class="btn btn-danger btn-small" onclick="deleteWheelStudent(${s.id})"><i class="fas fa-trash"></i></button>`;
+            list.appendChild(div);
+        });
+        if (!wheelStudents.length) {
+            list.innerHTML = '<div style="padding:16px; text-align:center; color:var(--gray-text);">Добавьте учеников</div>';
+        }
+    }
+
+    function drawWheel() {
+        let canvas = document.getElementById('wheelCanvas');
+        if (!canvas) return;
+        let ctx = canvas.getContext('2d');
+        let w = canvas.width, h = canvas.height;
+        let cx = w/2, cy = h/2, r = Math.min(cx,cy) - 15;
+        ctx.clearRect(0,0,w,h);
+        
+        if (!wheelStudents.length) {
+            ctx.fillStyle = '#F8FAFC';
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, 2*Math.PI);
+            ctx.fill();
+            ctx.fillStyle = '#94A3B8';
+            ctx.font = '14px Inter';
+            ctx.textAlign = 'center';
+            ctx.fillText('Добавьте учеников', cx, cy);
+            return;
+        }
+        
+        let angleStep = (2*Math.PI) / wheelStudents.length;
+        for (let i=0; i<wheelStudents.length; i++) {
+            let start = i*angleStep;
+            let end = (i+1)*angleStep;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.arc(cx, cy, r, start, end);
+            ctx.closePath();
+            ctx.fillStyle = wheelStudents[i].color;
+            ctx.fill();
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(start + angleStep/2);
+            ctx.textAlign = 'right';
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 14px Inter';
+            let name = wheelStudents[i].name.length > 12 ? wheelStudents[i].name.substring(0,10)+'…' : wheelStudents[i].name;
+            ctx.fillText(name, r-15, 0);
+            ctx.restore();
+        }
+        
+        ctx.beginPath();
+        ctx.arc(cx, cy, 25, 0, 2*Math.PI);
+        ctx.fillStyle = 'black';
+        ctx.fill();
+    }
+
+    let isSpinning = false;
+    function spinWheel() {
+        if (wheelStudents.length < 2 || isSpinning) return;
+        isSpinning = true;
+        let canvas = document.getElementById('wheelCanvas');
+        let result = document.getElementById('wheelResult');
+        let winner = wheelStudents[Math.floor(Math.random() * wheelStudents.length)];
+        let targetRotation = (8 + Math.floor(Math.random()*5)) * 360 + Math.random() * 360;
+        let startTime = null;
+        let duration = 3000;
+        
+        function animate(time) {
+            if (!startTime) startTime = time;
+            let progress = Math.min((time - startTime) / duration, 1);
+            let ease = 1 - Math.pow(1 - progress, 3);
+            let rotation = ease * targetRotation;
+            canvas.style.transform = `rotate(${rotation}deg)`;
+            
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                isSpinning = false;
+                result.innerHTML = `К доске: <strong>${winner.name}</strong>`;
+                canvas.style.transform = 'rotate(0deg)';
+                drawWheel();
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+
+    // ==================== 2. БОТ-ЖУРНАЛ ====================
+    function addJournalStudent() {
+        let name = document.getElementById('journalNameInput').value.trim();
+        let grades = document.getElementById('journalGradesInput').value.trim().split(/\s+/).map(Number).filter(g => g>=2 && g<=5);
+        if (name) {
+            journalStudents.push({id: Date.now(), name, grades});
+            saveJournal();
+            renderJournalStudents();
+        }
+        document.getElementById('journalNameInput').value = '';
+        document.getElementById('journalGradesInput').value = '';
+    }
+
+    function deleteJournalStudent(id) {
+        journalStudents = journalStudents.filter(s => s.id !== id);
+        saveJournal();
+        renderJournalStudents();
+    }
+
+    function renderJournalStudents() {
+        let tbody = document.getElementById('journalStudentsList');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        journalStudents.forEach(s => {
+            let avg = s.grades.length ? (s.grades.reduce((a,b)=>a+b,0)/s.grades.length).toFixed(2) : '—';
+            tbody.innerHTML += `<tr>
+                <td style="padding:12px;">${s.name}</td>
+                <td>${s.grades.join(' ')}</td>
+                <td><strong>${avg}</strong></td>
+                <td><button class="btn btn-danger btn-small" onclick="deleteJournalStudent(${s.id})"><i class="fas fa-trash"></i></button></td>
+            </tr>`;
+        });
+        if (!journalStudents.length) {
+            tbody.innerHTML = '<tr><td colspan="4" style="padding:30px; text-align:center;">Добавьте учеников</td></tr>';
+        }
+    }
+
+    function calculateJournal() {
+        if (!journalStudents.length) {
+            document.getElementById('journalResult').innerHTML = 'К доске: —';
+            return;
+        }
+        let worst = null;
+        let worstScore = Infinity;
+        journalStudents.forEach(s => {
+            if (!s.grades.length) {
+                if (0 < worstScore) { worstScore = 0; worst = s; }
+                return;
+            }
+            let avg = s.grades.reduce((a,b)=>a+b,0)/s.grades.length;
+            let min = Math.min(...s.grades);
+            let score = avg - (min <= 2 ? 2 : 0) - (Math.max(...s.grades)-min > 2 ? 1 : 0);
+            if (score < worstScore) { worstScore = score; worst = s; }
+        });
+        if (worst) {
+            document.getElementById('journalResult').innerHTML = `К доске: <strong>${worst.name}</strong>`;
+        }
+    }
+
+    // ==================== 3. БЛОКНОТ ====================
+    function createNote() {
+        let id = Date.now();
+        notes.push({ 
+            id, 
+            title: '+ Запись', 
+            content: '', 
+            date: new Date().toLocaleString('ru') 
+        });
+        saveNotes();
+        renderNotesList();
+        openNote(id);
+    }
+
+    function openNote(id) {
+        currentNoteId = id;
+        let note = notes.find(n => n.id === id);
+        if (note) {
+            document.getElementById('noteTextarea').value = note.content || '';
+            document.querySelectorAll('.note-item').forEach(el => el.classList.remove('active'));
+            let active = document.querySelector(`[data-note-id="${id}"]`);
+            if (active) active.classList.add('active');
+        }
+    }
+
+    function saveNote() {
+        if (!currentNoteId) return;
+        let note = notes.find(n => n.id === currentNoteId);
+        if (note) {
+            note.content = document.getElementById('noteTextarea').value || '';
+            note.title = (note.content.split('\n')[0] || 'Новая запись').substring(0, 35);
+            note.date = new Date().toLocaleString('ru');
+            saveNotes();
+            renderNotesList();
+        }
+    }
+
+    function deleteCurrentNote() {
+        if (!currentNoteId) return;
+        if (confirm('Удалить запись?')) {
+            notes = notes.filter(n => n.id !== currentNoteId);
+            saveNotes();
+            currentNoteId = null;
+            document.getElementById('noteTextarea').value = '';
+            renderNotesList();
+        }
+    }
+
+    function renderNotesList() {
+        let list = document.getElementById('notesList');
+        if (!list) return;
+        list.innerHTML = '';
+        notes.sort((a,b) => b.id - a.id).forEach(n => {
+            let div = document.createElement('div');
+            div.className = 'note-item' + (n.id === currentNoteId ? ' active' : '');
+            div.setAttribute('data-note-id', n.id);
+            div.onclick = () => openNote(n.id);
+            div.innerHTML = `
+                <div class="note-title">${n.title}</div>
+                <div class="note-preview">${(n.content || '').substring(0,40)}</div>
+                <div class="note-date">${n.date}</div>
+            `;
+            list.appendChild(div);
+        });
+        if (!notes.length) {
+            list.innerHTML = '<div style="padding:25px; text-align:center;">Записей нет</div>';
+        }
+    }
+
+    // ==================== 4. ТАЙМЕР ====================
+    function updateTimerFromInputs() {
+        let h = parseInt(document.getElementById('hoursInput')?.value) || 0;
+        let m = parseInt(document.getElementById('minutesInput')?.value) || 0;
+        let s = parseInt(document.getElementById('secondsInput')?.value) || 0;
+        timerSeconds = h*3600 + m*60 + s;
+        updateTimerDisplay();
+    }
+
+    function updateTimerDisplay() {
+        let h = Math.floor(timerSeconds/3600);
+        let m = Math.floor((timerSeconds%3600)/60);
+        let s = timerSeconds%60;
+        let disp = h>0 ? `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}` : `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        let el = document.getElementById('timerDisplay');
+        if (el) el.textContent = disp;
+    }
+
+    function startTimer() {
+        if (isTimerRunning) return;
+        updateTimerFromInputs();
+        if (timerSeconds <= 0) { alert('Установите время'); return; }
+        isTimerRunning = true;
+        timerInterval = setInterval(() => {
+            timerSeconds--;
+            updateTimerDisplay();
+            if (timerSeconds <= 0) {
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+                try {
+                    let audio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==');
+                    audio.play();
+                } catch(e) {}
+            }
+        }, 1000);
+    }
+
+    function pauseTimer() {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+    }
+
+    function resetTimer() {
+        pauseTimer();
+        updateTimerFromInputs();
+    }
+
+    // ==================== 5. СЧЕТЧИК ОЦЕНОК ====================
+    function calculateGrades() {
+        let inp = document.getElementById('gradesInput')?.value || '';
+        let grades = inp.split(/\s+/).map(Number).filter(g => !isNaN(g) && g>=2 && g<=5);
+        
+        let c2 = grades.filter(g=>g===2).length;
+        let c3 = grades.filter(g=>g===3).length;
+        let c4 = grades.filter(g=>g===4).length;
+        let c5 = grades.filter(g=>g===5).length;
+        
+        if (document.getElementById('count2')) document.getElementById('count2').textContent = c2;
+        if (document.getElementById('count3')) document.getElementById('count3').textContent = c3;
+        if (document.getElementById('count4')) document.getElementById('count4').textContent = c4;
+        if (document.getElementById('count5')) document.getElementById('count5').textContent = c5;
+        
+        if (document.getElementById('totalGrades')) document.getElementById('totalGrades').textContent = grades.length;
+        
+        if (document.getElementById('averageGrade')) {
+            let avg = grades.length ? (grades.reduce((a,b)=>a+b,0)/grades.length).toFixed(2) : '0.00';
+            document.getElementById('averageGrade').textContent = avg;
+        }
+    }
+
+    // ==================== 6. УЧЕТ ДЕНЕГ ====================
+    function addMoneyStudent() {
+        let name = document.getElementById('moneyStudentInput').value.trim();
+        if (name) {
+            moneyStudents.push({id: Date.now(), name, paid: false});
+            saveMoney();
+            renderMoneyStudents();
+            updateMoneyStats();
+        }
+        document.getElementById('moneyStudentInput').value = '';
+    }
+
+    function toggleMoneyStudent(id) {
+        let s = moneyStudents.find(s => s.id === id);
+        if (s) { s.paid = !s.paid; saveMoney(); renderMoneyStudents(); updateMoneyStats(); }
+    }
+
+    function deleteMoneyStudent(id) {
+        moneyStudents = moneyStudents.filter(s => s.id !== id);
+        saveMoney();
+        renderMoneyStudents();
+        updateMoneyStats();
+    }
+
+    function markAllPaid() {
+        moneyStudents.forEach(s => s.paid = true);
+        saveMoney();
+        renderMoneyStudents();
+        updateMoneyStats();
+    }
+
+    function markAllUnpaid() {
+        moneyStudents.forEach(s => s.paid = false);
+        saveMoney();
+        renderMoneyStudents();
+        updateMoneyStats();
+    }
+
+    function updateMoneyStats() {
+        let total = moneyStudents.length;
+        let paid = moneyStudents.filter(s => s.paid).length;
+        let unpaid = total - paid;
+        let percent = total ? Math.round((paid / total) * 100) : 0;
+        
+        if (document.getElementById('totalStudents')) document.getElementById('totalStudents').textContent = total;
+        if (document.getElementById('paidCount')) document.getElementById('paidCount').textContent = paid;
+        if (document.getElementById('unpaidCount')) document.getElementById('unpaidCount').textContent = unpaid;
+        if (document.getElementById('collectionPercent')) document.getElementById('collectionPercent').textContent = percent + '%';
+    }
+
+    function renderMoneyStudents() {
+        let tbody = document.getElementById('moneyStudentsList');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        moneyStudents.forEach(s => {
+            tbody.innerHTML += `<tr>
+                <td style="padding:12px;">${s.name}</td>
+                <td style="text-align:center;">
+                    <div class="custom-checkbox ${s.paid ? 'checked' : ''}" onclick="toggleMoneyStudent(${s.id})"
+                        style="width:28px; height:28px; background:${s.paid ? '#8B3DFF' : 'white'}; border:2px solid var(--gray-border); border-radius:6px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">
+                        <i class="fas fa-check" style="color:white; ${s.paid ? '' : 'display:none;'}"></i>
+                    </div>
+                </td>
+                <td><button class="btn btn-danger btn-small" onclick="deleteMoneyStudent(${s.id})"><i class="fas fa-trash"></i></button></td>
+            </tr>`;
+        });
+        if (!moneyStudents.length) {
+            tbody.innerHTML = '<tr><td colspan="3" style="padding:30px; text-align:center;">Добавьте учеников</td></tr>';
+        }
+    }
+
+    function exportToCSV() {
+        if (!moneyStudents.length) {
+            alert('Нет данных для экспорта');
+            return;
+        }
+        
+        let csv = 'Имя,Статус\n';
+        moneyStudents.forEach(s => {
+            csv += `${s.name},${s.paid ? 'Сдал' : 'Не сдал'}\n`;
+        });
+        
+        let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        let link = document.createElement('a');
+        let url = URL.createObjectURL(blob);
+        link.href = url;
+        link.setAttribute('download', 'ucheniki_oplata.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+    
+    function exportToPNG() {
+        if (!moneyStudents.length) {
+            alert('Нет данных для экспорта');
+            return;
+        }
+        
+        // Создаем временный элемент для скриншота
+        let element = document.createElement('div');
+        element.style.background = 'white';
+        element.style.padding = '30px';
+        element.style.borderRadius = '20px';
+        element.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+        element.style.width = '600px';
+        
+        let total = moneyStudents.length;
+        let paid = moneyStudents.filter(s => s.paid).length;
+        let unpaid = total - paid;
+        let percent = total ? Math.round((paid / total) * 100) : 0;
+        
+        element.innerHTML = `
+            <h2 style="color: #8B3DFF; margin-bottom: 20px;">📊 Учет денег - UbuTeacher</h2>
+            <div style="display: flex; justify-content: space-around; margin-bottom: 30px;">
+                <div style="text-align: center;">
+                    <div style="font-size: 32px; font-weight: bold; color: #8B3DFF;">${total}</div>
+                    <div style="color: #475569;">Всего учеников</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 32px; font-weight: bold; color: #10B981;">${paid}</div>
+                    <div style="color: #475569;">Сдали</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 32px; font-weight: bold; color: #EF4444;">${unpaid}</div>
+                    <div style="color: #475569;">Не сдали</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 32px; font-weight: bold; color: #8B3DFF;">${percent}%</div>
+                    <div style="color: #475569;">Собираемость</div>
+                </div>
+            </div>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #8B3DFF; color: white;">
+                        <th style="padding: 12px; text-align: left;">Ученик</th>
+                        <th style="padding: 12px; text-align: left;">Статус</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${moneyStudents.map(s => `
+                        <tr style="border-bottom: 1px solid #E2E8F0;">
+                            <td style="padding: 12px;">${s.name}</td>
+                            <td style="padding: 12px; color: ${s.paid ? '#10B981' : '#EF4444'}; font-weight: 600;">
+                                ${s.paid ? '✓ Сдал' : '✗ Не сдал'}
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            <div style="margin-top: 30px; text-align: center; color: #94A3B8; font-size: 12px;">
+                UbuTeacher © 2026  ${new Date().toLocaleString('ru')}
+            </div>
+        `;
+        
+        document.body.appendChild(element);
+        
+        if (typeof html2canvas !== 'undefined') {
+            html2canvas(element, {
+                scale: 2,
+                backgroundColor: '#FFFFFF',
+                allowTaint: true,
+                useCORS: true
+            }).then(canvas => {
+                let link = document.createElement('a');
+                link.download = 'ucheniki_oplata.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                document.body.removeChild(element);
+            }).catch(error => {
+                console.error(error);
+                alert('Ошибка при создании PNG. Попробуйте еще раз.');
+                document.body.removeChild(element);
+            });
+        } else {
+            alert('Библиотека html2canvas еще не загружена. Попробуйте еще раз через секунду.');
+            document.body.removeChild(element);
+        }
+    }
+
+    // ==================== 7. ГЕНЕРАТОР ФРАЗ ====================
+    function changePhraseCategory(category) {
+        currentCategory = category;
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.textContent.toLowerCase().includes(category) || 
+                (category === 'praise' && btn.textContent.includes('Похвала')) ||
+                (category === 'concern' && btn.textContent.includes('Беспокойство')) ||
+                (category === 'homework' && btn.textContent.includes('Домашнее')) ||
+                (category === 'behavior' && btn.textContent.includes('Поведение')) ||
+                (category === 'progress' && btn.textContent.includes('Прогресс'))) {
+                btn.classList.add('active');
+            }
+        });
+        generatePhrase();
+        renderPhrasesList();
+    }
+
+    function setCustomName() {
+        let name = document.getElementById('customNameInput').value.trim();
+        if (name) {
+            currentCustomName = name;
+            generatePhrase();
+            renderPhrasesList();
+        }
+    }
+
+    function resetCustomName() {
+        currentCustomName = 'Александра';
+        document.getElementById('customNameInput').value = currentCustomName;
+        generatePhrase();
+        renderPhrasesList();
+    }
+
+    function generatePhrase() {
+        let categoryPhrases = phrases[currentCategory] || phrases.praise;
+        let randomIndex = Math.floor(Math.random() * categoryPhrases.length);
+        let phrase = categoryPhrases[randomIndex];
+        
+        // Подставляем имя
+        phrase = phrase.replace('{name}', currentCustomName);
+        
+        document.getElementById('currentPhrase').textContent = '«' + phrase + '»';
+    }
+
+    function copyPhrase() {
+        let phrase = document.getElementById('currentPhrase').textContent;
+        navigator.clipboard.writeText(phrase).then(() => {
+            alert('Фраза скопирована!');
+        });
+    }
+
+    function renderPhrasesList() {
+        let list = document.getElementById('phrasesList');
+        if (!list) return;
+        list.innerHTML = '';
+        
+        let categoryPhrases = phrases[currentCategory] || phrases.praise;
+        
+        // Показываем 5 случайных фраз
+        let shuffled = [...categoryPhrases].sort(() => 0.5 - Math.random());
+        shuffled.slice(0, 5).forEach(phrase => {
+            let phr = phrase.replace('{name}', currentCustomName);
+            let div = document.createElement('div');
+            div.className = 'phrase-item';
+            div.innerHTML = `
+                <div class="phrase-item-text">«${phr}»</div>
+                <button class="btn btn-outline btn-small" onclick="copyCustomPhrase('${phr.replace(/'/g, "\\'")}')">
+                    <i class="fas fa-copy"></i>
+                </button>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    function copyCustomPhrase(phrase) {
+        navigator.clipboard.writeText('«' + phrase + '»').then(() => {
+            alert('Фраза скопирована!');
+        });
+    }
+
+    // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+    window.onload = function() {
+        loadFromStorage();
+        
+        // Таймер инпуты
+        ['hoursInput','minutesInput','secondsInput'].forEach(id => {
+            let el = document.getElementById(id);
+            if (el) el.addEventListener('input', updateTimerFromInputs);
+        });
+        
+        // Счетчик оценок по умолчанию
+        calculateGrades();
+        
+        // html2canvas для экспорта PNG
+        let script = document.createElement('script');
+        script.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
+        document.head.appendChild(script);
+    };
+</script>
+</body>
+</html>
